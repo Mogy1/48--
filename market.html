@@ -1,0 +1,434 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>نسب السوق - مشروع 48</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <style>
+        :root {
+            --primary-color: #00d2ff;
+            --secondary-color: #3a7bd5;
+            --glass-bg: rgba(255, 255, 255, 0.07);
+            --glass-border: rgba(255, 255, 255, 0.15);
+            --text-main: #ffffff;
+            --text-muted: #b0bec5;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Cairo", sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+            color: var(--text-main);
+            min-height: 100vh;
+            padding-bottom: 50px;
+        }
+
+        nav {
+            background: rgba(15, 32, 39, 0.95);
+            backdrop-filter: blur(15px);
+            padding: 0 40px;
+            height: 70px;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 50px;
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 800;
+            background: linear-gradient(to right, #fff, var(--primary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 40px;
+            list-style: none;
+        }
+
+        .nav-item {
+            position: relative;
+        }
+
+        .nav-item>a {
+            color: #e0e0e0;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.95rem;
+            padding: 20px 0;
+            display: block;
+            transition: 0.3s;
+        }
+
+        .nav-item>a.active {
+            color: var(--primary-color);
+        }
+
+        .nav-item:hover>a {
+            color: var(--primary-color);
+        }
+
+        .dropdown-menu {
+            visibility: hidden;
+            opacity: 0;
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: rgba(15, 32, 39, 0.98);
+            min-width: 250px;
+            border-radius: 10px;
+            border: 1px solid var(--glass-border);
+            padding: 10px 0;
+            transform: translateY(10px);
+            transition: all 0.3s ease;
+            z-index: 1001;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .nav-item:hover .dropdown-menu {
+            visibility: visible;
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .dropdown-item {
+            display: block;
+            padding: 12px 20px;
+            color: #ddd;
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+
+        .dropdown-item:hover {
+            background: rgba(0, 210, 255, 0.1);
+            color: #fff;
+            padding-right: 25px;
+        }
+
+        .formula {
+            display: block;
+            font-size: 0.7rem;
+            color: var(--primary-color);
+            margin-top: 4px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        section.calc-section {
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 35px;
+            margin-bottom: 30px;
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            color: var(--primary-color);
+            margin-bottom: 15px;
+            border-right: 4px solid var(--primary-color);
+            padding-right: 15px;
+        }
+
+        .input-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+        }
+
+        .year-row {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+        }
+
+        .year-label {
+            text-align: center;
+            font-size: 0.9rem;
+            color: var(--primary-color);
+            font-weight: 600;
+            background: rgba(0, 210, 255, 0.1);
+            padding: 5px;
+            border-radius: 5px;
+        }
+
+        input[type="number"] {
+            width: 100%;
+            padding: 14px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(0, 0, 0, 0.3);
+            color: #fff;
+            font-size: 1rem;
+            text-align: center;
+            outline: none;
+            transition: 0.3s;
+        }
+
+        input[type="number"]:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 15px rgba(0, 210, 255, 0.3);
+        }
+
+        .btn-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr auto;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        button {
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            filter: brightness(1.1);
+        }
+
+        .btn-calc {
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            color: #fff;
+        }
+
+        .btn-reset {
+            background: rgba(255, 255, 255, 0.1);
+            color: #aaa;
+        }
+
+        .btn-pdf {
+            background: #ff5252;
+            color: white;
+            font-size: 0.9rem;
+        }
+
+        .results-container {
+            margin-top: 25px;
+            display: none;
+            padding-top: 20px;
+            border-top: 1px dashed rgba(255, 255, 255, 0.1);
+        }
+
+        .result-cards {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .card {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 15px;
+            border-radius: 12px;
+            text-align: center;
+            transition: 0.3s;
+        }
+
+        .card:hover {
+            background: rgba(0, 210, 255, 0.1);
+            transform: translateY(-3px);
+        }
+
+        .card-year {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .card-value {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #fff;
+            margin-top: 5px;
+        }
+
+        .chart-container {
+            max-width: 500px;
+            margin: 20px auto 0;
+        }
+
+        canvas {
+            max-height: 280px;
+            background: rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            padding: 10px;
+        }
+
+        @media (max-width: 768px) {
+            nav {
+                flex-direction: column;
+                height: auto;
+            }
+
+            .year-row,
+            .btn-group {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <nav>
+        <a href="index.html" class="logo">مشروع ( 48 ) </a>
+        <ul class="nav-links">
+            <li class="nav-item">
+                <a href="liquidity.html">السيولة</a>
+                <div class="dropdown-menu">
+                    <a class="dropdown-item" href="liquidity.html#current-ratio">النسبة الجارية <span class="formula">الأصول المتداولة ÷ الخصوم</span></a>
+                    <a class="dropdown-item" href="liquidity.html#quick-ratio">النسبة السريعة <span class="formula">(الأصول - المخزون) ÷ الخصوم</span></a>
+                    <a class="dropdown-item" href="liquidity.html#cash-ratio">نسبة النقدية <span class="formula">النقدية ÷ الخصوم</span></a>
+                    <a class="dropdown-item" href="liquidity.html#working-capital">رأس المال العامل <span class="formula">الأصول المتداولة - الخصوم المتداولة</span></a>
+                    <a class="dropdown-item" href="liquidity.html#operating-cash-flow-ratio">نسبة السيولة التشغيلية <span class="formula">التدفق النقدي التشغيلي ÷ الخصوم المتداولة</span></a>
+                </div>
+            </li>
+            <li class="nav-item">
+                <a href="profitability.html">الربحية</a>
+                <div class="dropdown-menu">
+                    <a class="dropdown-item" href="profitability.html#gross-profit-margin">هامش صافي الربح<span class="formula">الربح الإجمالي ÷ المبيعات</span></a>
+                    <a class="dropdown-item" href="profitability.html#operating-profit-margin">هامش الربح التشغيلي <span class="formula">الربح التشغيلي ÷ المبيعات</span></a>
+                    <a class="dropdown-item" href="profitability.html#npm">هامش صافي الربح <span class="formula">صافي الربح ÷ المبيعات</span></a>
+                    <a class="dropdown-item" href="profitability.html#roa">العائد على الأصول <span class="formula">صافي الربح ÷ الأصول</span></a>
+                    <a class="dropdown-item" href="profitability.html#roe">العائد على الملكية <span class="formula">صافي الربح ÷ الملكية</span></a>
+                    <a class="dropdown-item" href="profitability.html#roi">العائد على الاستثمار <span class="formula">صافي الربح ÷ التكلفة الاستثمارية</span></a>
+                    <a class="dropdown-item" href="profitability.html#ros">العائد على المبيعات <span class="formula">صافي الربح ÷ المبيعات</span></a>
+                </div>
+            </li>
+            <li class="nav-item">
+                <a href="debt.html">المديونية</a>
+                <div class="dropdown-menu">
+                    <a class="dropdown-item" href="leverage.html#debt-equity">الدين إلى حقوق الملكية <span class="formula">إجمالي الدين ÷ حقوق الملكية</span></a>
+                    <a class="dropdown-item" href="leverage.html#debt-ratio">نسبة الدين إلى الأصول <span class="formula">إجمالي الدين ÷ إجمالي الأصول</span></a>
+                    <a class="dropdown-item" href="leverage.html#interest-coverage">تغطية الفوائد <span class="formula">EBIT ÷ مصروف الفوائد</span></a>
+                    <a class="dropdown-item" href="leverage.html#dscr">تغطية خدمة الدين DSCR <span class="formula">دخل التشغيل ÷ (الفوائد + سداد الأصل)</span></a>
+                    <a class="dropdown-item" href="leverage.html#financial-leverage">الرافعة المالية <span class="formula">إجمالي الأصول ÷ حقوق الملكية</span></a>
+                </div>
+            </li>
+            <li class="nav-item">
+                <a href="activity.html">النشاط</a>
+                <div class="dropdown-menu">
+                    <a class="dropdown-item" href="activity.html#inventory-turnover">دوران المخزون <span class="formula">تكلفة المبيعات ÷ متوسط المخزون</span></a>
+                    <a class="dropdown-item" href="activity.html#dio">فترة التخزين DIO <span class="formula">365 ÷ معدل دوران المخزون</span></a>
+                    <a class="dropdown-item" href="activity.html#receivables-turnover">دوران الذمم المدينة <span class="formula">المبيعات ÷ متوسط المدينين</span></a>
+                    <a class="dropdown-item" href="activity.html#dso">فترة التحصيل DSO <span class="formula">365 ÷ معدل دوران المدينين</span></a>
+                    <a class="dropdown-item" href="activity.html#payables-turnover">دوران الذمم الدائنة <span class="formula">تكلفة المبيعات ÷ متوسط الدائنين</span></a>
+                    <a class="dropdown-item" href="activity.html#dpo">فترة السداد DPO <span class="formula">365 ÷ معدل دوران الدائنين</span></a>
+                    <a class="dropdown-item" href="activity.html#ccc">دورة التحول النقدي CCC <span class="formula">DIO + DSO - DPO</span></a>
+                    <a class="dropdown-item" href="activity.html#asset-turnover">معدل دوران الأصول <span class="formula">المبيعات ÷ إجمالي الأصول</span></a>
+                </div>
+            </li>
+            <li class="nav-item">
+                <a href="market.html" class="active">السوق</a>
+                <div class="dropdown-menu">
+                    <a class="dropdown-item" href="market.html#eps">ربحية السهم <span class="formula">صافي الربح ÷ عدد الأسهم</span></a>
+                    <a class="dropdown-item" href="market.html#bvps">القيمة الدفترية للسهم <span class="formula">حقوق الملكية ÷ عدد الأسهم</span></a>
+                    <a class="dropdown-item" href="market.html#market-price">القيمة السوقية للسهم <span class="formula">سعر السوق</span></a>
+                    <a class="dropdown-item" href="market.html#pe">مكرر الربحية P/E <span class="formula">سعر السهم ÷ EPS</span></a>
+                    <a class="dropdown-item" href="market.html#pbv">مكرر القيمة الدفترية P/B <span class="formula">سعر السهم ÷ BVPS</span></a>
+                    <a class="dropdown-item" href="market.html#ps">مكرر المبيعات P/S <span class="formula">سعر السهم ÷ المبيعات لكل سهم</span></a>
+                    <a class="dropdown-item" href="market.html#dividend-yield">عائد التوزيعات <span class="formula">التوزيعات ÷ سعر السهم</span></a>
+                    <a class="dropdown-item" href="market.html#dividend-payout">نسبة التوزيع <span class="formula">التوزيعات ÷ EPS</span></a>
+                    <a class="dropdown-item" href="market.html#eva">القيمة الاقتصادية المضافة EVA <span class="formula">NOPAT - (WACC × رأس المال)</span></a>
+                </div>
+            </li>
+        </ul>
+    </nav>
+
+    <div class="container">
+        <section id="pe" class="calc-section">
+            <h2>نسبة السعر للربحية (P/E Ratio)</h2>
+            <div class="input-grid">
+                <div class="year-row">
+                    <div class="year-label">2023</div>
+                    <div class="year-label">2024</div>
+                    <div class="year-label">2025</div>
+                </div>
+                <div class="year-row">
+                    <input type="number" id="pe_p_23" placeholder="سعر السهم" />
+                    <input type="number" id="pe_p_24" placeholder="سعر السهم" />
+                    <input type="number" id="pe_p_25" placeholder="سعر السهم" />
+                </div>
+                <div class="year-row">
+                    <input type="number" id="pe_e_23" placeholder="ربحية السهم (EPS)" />
+                    <input type="number" id="pe_e_24" placeholder="ربحية السهم (EPS)" />
+                    <input type="number" id="pe_e_25" placeholder="ربحية السهم (EPS)" />
+                </div>
+                <div class="btn-group">
+                    <button class="btn-calc" onclick="calcPE()">احسب</button>
+                    <button class="btn-reset" onclick="resetSection('pe', 'resPE', 'chartPE')">إعادة تعيين</button>
+                    <button class="btn-pdf" onclick="exportPDF('pe')">PDF</button>
+                </div>
+            </div>
+            <div class="results-container" id="resPE_cont">
+                <div class="result-cards" id="resPE"></div>
+                <div class="chart-container"><canvas id="chartPE"></canvas></div>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        const years = [23, 24, 25]; const charts = {}; const colors = ["#00d2ff", "#ffa726", "#66bb6a"];
+        const formatNumber = (num) => num.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        const div = (a, b) => b === 0 ? 0 : a / b;
+
+        function calcPE() {
+            let data = []; let html = ""; let hasData = false;
+            years.forEach((y) => {
+                let val1 = parseFloat(document.getElementById(`pe_p_${y}`).value) || 0;
+                let val2 = parseFloat(document.getElementById(`pe_e_${y}`).value) || 0;
+                if (val1 !== 0 || val2 !== 0) hasData = true;
+                let res = div(val1, val2);
+                data.push(res);
+                html += `<div class="card"><div class="card-year">20${y}</div><div class="card-value">${formatNumber(res)}</div></div>`;
+            });
+            if (!hasData) { alert("الرجاء إدخال بيانات"); return; }
+            document.getElementById("resPE").innerHTML = html;
+            document.getElementById("resPE_cont").style.display = "block";
+            renderChart("chartPE", "P/E Ratio", data);
+        }
+        function renderChart(chartId, label, data) {
+            if (charts[chartId]) charts[chartId].destroy();
+            const ctx = document.getElementById(chartId).getContext("2d");
+            charts[chartId] = new Chart(ctx, {
+                type: "bar", data: { labels: ["2023", "2024", "2025"], datasets: [{ label: label, data: data, backgroundColor: colors, borderRadius: 8 }] },
+                options: { responsive: true, maintainAspectRatio: false, animation: { duration: 800, easing: 'easeOutQuart' }, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { color: "#aaa" }, grid: { color: "rgba(255,255,255,0.1)" } }, x: { ticks: { color: "#aaa" } } } }
+            });
+        }
+        function resetSection(prefix, resId, chartId) {
+            document.querySelectorAll(`input[id^='${prefix}']`).forEach(input => input.value = '');
+            document.getElementById(resId + "_cont").style.display = "none";
+            if (charts[chartId]) { charts[chartId].destroy(); charts[chartId] = null; }
+        }
+        function exportPDF(sectionId) {
+            const element = document.getElementById(sectionId);
+            const opt = { margin: 10, filename: `تقرير_${sectionId}.pdf`, image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2, useCORS: true, backgroundColor: '#203a43' }, jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' } };
+            html2pdf().set(opt).from(element).save();
+        }
+    </script>
+</body>
+
+</html>

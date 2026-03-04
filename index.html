@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Page - مشروع 48</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --text-main: #fff;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Cairo', sans-serif;
+        }
+
+        body {
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+            color: var(--text-main);
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(15px);
+            padding: 40px;
+            width: 350px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            color: #fff;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .container h2 {
+            margin-bottom: 25px;
+            font-weight: 700;
+            font-size: 1.8rem;
+        }
+
+        .input-box {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .input-box input {
+            width: 100%;
+            padding: 14px 15px;
+            border: none;
+            outline: none;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.2);
+            color: #fff;
+            font-size: 15px;
+            transition: 0.3s;
+        }
+
+        .input-box input:focus {
+            background: rgba(255, 255, 255, 0.3);
+            border: 1px solid rgba(255,255,255,0.4);
+        }
+
+        .input-box input::placeholder {
+            color: #ddd;
+        }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 10px;
+            background: linear-gradient(45deg, #00d2ff, #3a7bd5); /* تعديل ليتناسب مع تصميم المشروع */
+            color: #fff;
+            font-weight: 700;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        button:hover {
+            filter: brightness(1.1);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .error-msg {
+            color: #ff6b6b;
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+            display: none;
+        }
+
+        @keyframes shake {
+            0% { transform: translateX(0); }
+            25% { transform: translateX(10px); }
+            50% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+            100% { transform: translateX(0); }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h2>تسجيل الدخول</h2>
+        
+        <div class="error-msg" id="errorMsg">اسم المستخدم أو كلمة المرور غير صحيحة</div>
+
+        <div class="input-box">
+            <input type="text" id="username" required placeholder="اسم المستخدم">
+        </div>
+
+        <div class="input-box">
+            <input type="password" id="password" required placeholder="كلمة المرور">
+        </div>
+        
+        <button onclick="validateLogin()">دخول</button>
+    </div>
+
+    <script>
+        function validateLogin() {
+            var user = document.getElementById('username').value;
+            var pass = document.getElementById('password').value;
+            var errorMsg = document.getElementById('errorMsg');
+            const users = [
+                { username: "DR ALI", password: "00000000" },
+                { username: "ENG ESRAA", password: "11111111" },
+                { username: "ADMIN", password: "12345" }
+            ];
+            const isValid = users.some(u => u.username === user && u.password === pass);
+
+            if (isValid) {
+                window.location.href = 'liquidity.html';
+            } else {
+                errorMsg.style.display = 'block'; 
+                
+                const container = document.querySelector('.container');
+                container.style.animation = 'shake 0.5s';  
+                setTimeout(() => container.style.animation = '', 500);
+            }
+        }
+    </script>
+</body>
+
+</html>
